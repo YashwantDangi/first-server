@@ -4,7 +4,7 @@ const http = require("http");
 
 const port = 8081;
 
-const toDOList = ["Need to learn", "Need to code"];
+const toDoList = ["Need to learn", "Need to code"];
 
 // http Methods
 
@@ -26,20 +26,46 @@ http
       // http://localhost:8081/todos
       if (method === "GET") {
         res.writeHead(200, { "Content-Type": "text/html" });
-        res.write(toDOList.toString());
+        res.write(toDoList.toString());
       } else if (method === "POST") {
         let body = "";
-        req.on("error", (err) => {
-          console.log(err);
-        }).on("data", (chunk) => {
-          body += chunk;
-          // console.log(chunk);
-        }).on('end', () => {
-          body = JSON.parse(body);
-          console.log("body data " , body);
-        });
-      }
-      else {
+        req
+          .on("error", (err) => {
+            console.log(err);
+          })
+          .on("data", (chunk) => {
+            body += chunk;
+            // console.log(chunk);
+          })
+          .on("end", () => {
+            body = JSON.parse(body);
+            // console.log("body data " , body);
+            let newToDo = toDoList;
+            newToDo.push(body.item);
+            console.log(newToDo);
+            res.writeHead(201);
+          });
+      } else if (method === "DELETE") {
+        let body = "";
+        req
+          .on("error", (err) => {
+            console.error(err);
+          })
+          .on("data", (chunk) => {
+            body += chunk;
+          })
+          .on("end", () => {
+            body = JSON.parse(body);
+            let deleteItem = body.item;
+            for (let i = 0; i < toDoList.length; i++) {
+              if (toDoList[i] === deleteItem) {
+                toDoList.splice(i, 1);
+                break;
+              }
+            }
+            res.writeHead(204);
+          });
+      } else {
         res.writeHead(501);
       }
     } else {
@@ -51,12 +77,10 @@ http
     console.log(`My NodeJs server started on port ${port}`);
   });
 
+// Different routes (url) ->
 
-
-  // Different routes (url) ->
-
-  // To run server : http://localhost:8081
-  // http://localhost:8081/
-  // http://localhost:8081/home/
-  // http://localhost:8081/aboutUs/
-  // http://localhost:8081/contactUs/
+// To run server : http://localhost:8081
+// http://localhost:8081/
+// http://localhost:8081/home/
+// http://localhost:8081/aboutUs/
+// http://localhost:8081/contactUs/
